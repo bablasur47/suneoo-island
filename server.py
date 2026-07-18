@@ -157,7 +157,10 @@ def not_found(_):
 
 def main():
     port = int(os.environ.get('PORT', 5000))
-    host = os.environ.get('HOST', '127.0.0.1')
+    # On hosting platforms (Render sets RENDER=true) we must bind all interfaces;
+    # locally we stay on localhost unless HOST is set explicitly.
+    default_host = '0.0.0.0' if os.environ.get('RENDER') else '127.0.0.1'
+    host = os.environ.get('HOST', default_host)
     debug = os.environ.get('FLASK_DEBUG', '').lower() in ('1', 'true')
     print(f'Server running at http://localhost:{port}')
     if debug:
