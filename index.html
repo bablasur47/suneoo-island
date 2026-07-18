@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light">
+<title>Suneo Island</title>
+<style>
+:root {
+  --bg: #f6f7fb;
+  --bg-2: #ffffff;
+  --bg-3: #eff1f8;
+  --border: #e5e7f0;
+  --border-hi: #c9cee2;
+  --text: #1d2136;
+  --text-dim: #5b6178;
+  --text-faint: #969cb3;
+  --accent: #7c3aed;
+  --accent-2: #ec4899;
+  --grad: linear-gradient(135deg, #7c3aed, #ec4899, #f97316);
+  --radius: 12px;
+  --shadow: 0 10px 30px rgba(35, 40, 80, 0.12);
+}
+@keyframes gradShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scrollbar-color: var(--border-hi) var(--bg); }
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  background:
+    radial-gradient(700px 400px at 85% -50px, rgba(236, 72, 153, 0.07), transparent 70%),
+    radial-gradient(700px 400px at 10% -50px, rgba(124, 58, 237, 0.07), transparent 70%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+button { font-family: inherit; }
+
+/* ---------- Header ---------- */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+header::before {
+  content: ''; display: block; height: 3px;
+  background: linear-gradient(90deg, #7c3aed, #ec4899, #f97316, #7c3aed);
+  background-size: 300% 100%;
+  animation: gradShift 6s linear infinite;
+}
+.header-inner {
+  max-width: 1500px; margin: 0 auto;
+  padding: 12px 20px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; user-select: none; white-space: nowrap;
+}
+.brand .logo {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--grad);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; color: #fff;
+  box-shadow: 0 3px 12px rgba(124, 58, 237, 0.35);
+}
+.brand h1 {
+  font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;
+  background: var(--grad);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#search-form {
+  display: flex; gap: 8px; flex: 1; min-width: 260px; position: relative;
+}
+.search-box {
+  position: relative; flex: 1; display: flex; align-items: center;
+}
+.search-box svg {
+  position: absolute; left: 12px; width: 16px; height: 16px;
+  stroke: var(--text-faint); pointer-events: none;
+}
+#search-input {
+  width: 100%; padding: 10px 38px 10px 36px;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg-2); color: var(--text);
+  font-size: 14px; outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+}
+#search-clear {
+  position: absolute; right: 8px;
+  background: none; border: none; color: var(--text-faint);
+  font-size: 16px; cursor: pointer; padding: 4px; display: none;
+}
+#search-clear:hover { color: var(--text); }
+#suggest {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 10px; box-shadow: var(--shadow);
+  overflow: hidden; display: none; z-index: 110;
+}
+#suggest .s-item {
+  padding: 9px 14px; font-size: 14px; cursor: pointer;
+  display: flex; justify-content: space-between; gap: 10px;
+}
+#suggest .s-item:hover, #suggest .s-item.sel { background: var(--bg-3); }
+#suggest .s-item .cnt { color: var(--text-faint); font-size: 12px; }
+select {
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg-2); color: var(--text); font-size: 13px;
+  outline: none; cursor: pointer;
+}
+select:focus { border-color: var(--accent); }
+.btn-primary {
+  padding: 10px 22px; border: none; border-radius: 10px;
+  background: var(--grad); color: #fff;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 3px 12px rgba(124, 58, 237, 0.3);
+}
+.btn-primary:hover { box-shadow: 0 5px 20px rgba(236, 72, 153, 0.4); }
+.btn-primary:active { transform: scale(0.97); }
+
+/* ---------- Category chips ---------- */
+#cats {
+  max-width: 1500px; margin: 0 auto;
+  padding: 10px 20px 12px;
+  display: flex; gap: 8px; overflow-x: auto;
+  scrollbar-width: none;
+}
+#cats::-webkit-scrollbar { display: none; }
+.chip {
+  flex: 0 0 auto;
+  padding: 7px 15px; border-radius: 999px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  color: var(--text-dim); font-size: 13px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.15s;
+  box-shadow: 0 1px 3px rgba(35, 40, 80, 0.06);
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+.chip.active {
+  background: var(--grad); border-color: transparent;
+  color: #fff; box-shadow: 0 3px 12px rgba(124, 58, 237, 0.35);
+}
+
+/* ---------- Main / grid ---------- */
+main { max-width: 1500px; margin: 0 auto; padding: 8px 20px 40px; }
+.result-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 2px 14px; font-size: 13px; color: var(--text-faint);
+}
+#results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+}
+.card {
+  border-radius: var(--radius); overflow: hidden; cursor: pointer;
+  position: relative; aspect-ratio: 16/10;
+  background: var(--bg-2); border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(35, 40, 80, 0.07);
+  transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+}
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-hi);
+  box-shadow: var(--shadow);
+}
+.card img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  background: var(--bg-3);
+}
+.card .badges {
+  position: absolute; top: 8px; left: 8px; right: 8px;
+  display: flex; justify-content: space-between; pointer-events: none;
+}
+.badge {
+  background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px);
+  padding: 3px 8px; border-radius: 6px;
+  font-size: 11px; font-weight: 600; color: #fff;
+  display: flex; align-items: center; gap: 4px;
+}
+.badge.hd { color: #6ee7a0; }
+.card .play-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0; transition: opacity 0.18s;
+}
+.card:hover .play-overlay { opacity: 1; }
+.play-circle {
+  width: 54px; height: 54px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(6px); border: 2px solid rgba(255, 255, 255, 0.4);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; transition: transform 0.15s;
+}
+.card:hover .play-circle { transform: scale(1.08); }
+.play-circle svg { width: 20px; height: 20px; fill: #fff; margin-left: 3px; }
+.card .bottom {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 34px 10px 8px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.88));
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 8px;
+}
+.card .meta { min-width: 0; }
+.card .title {
+  font-size: 13px; font-weight: 600; color: #f2f2f2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card .stats {
+  font-size: 11px; color: #b8b8c8; margin-top: 2px;
+  display: flex; gap: 10px;
+}
+.card .dl-btn {
+  flex: 0 0 auto;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12); border: none;
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; opacity: 0; transition: opacity 0.18s, background 0.15s;
+}
+.card:hover .dl-btn { opacity: 1; }
+.card .dl-btn:hover { background: var(--accent); }
+.card .dl-btn svg { width: 15px; height: 15px; stroke: #fff; }
+
+/* ---------- States ---------- */
+#loading { text-align: center; padding: 70px 20px; color: var(--text-faint); }
+.spinner {
+  width: 36px; height: 36px; margin: 0 auto 14px;
+  border: 3px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#error {
+  text-align: center; padding: 50px 20px;
+  color: #e11d48; font-size: 15px; display: none;
+}
+#error button {
+  display: block; margin: 14px auto 0;
+  padding: 8px 20px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg-2); color: var(--text); cursor: pointer; font-size: 13px;
+}
+#error button:hover { border-color: var(--accent); color: var(--accent); }
+.skeleton {
+  border-radius: var(--radius); aspect-ratio: 16/10;
+  border: 1px solid var(--border);
+  background: linear-gradient(100deg, var(--bg-3) 40%, #fff 50%, var(--bg-3) 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+#load-more-wrap { text-align: center; padding: 26px 0 10px; }
+#load-more {
+  padding: 11px 34px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--bg-2); color: var(--text); font-size: 14px;
+  font-weight: 600; cursor: pointer; transition: all 0.15s;
+}
+#load-more:hover { border-color: var(--accent); color: var(--accent); }
+#load-more:disabled { opacity: 0.4; cursor: default; }
+
+/* ---------- Player modal ---------- */
+#player {
+  display: none; position: fixed; inset: 0;
+  background: rgba(24, 22, 38, 0.6); z-index: 200;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+  animation: fadeIn 0.15s;
+}
+@keyframes fadeIn { from { opacity: 0; } }
+#player.active { display: flex; }
+#player .wrap {
+  position: relative; width: 94%; max-width: 1000px;
+  max-height: 94vh; display: flex; flex-direction: column;
+  background: var(--bg-2); border-radius: 16px;
+  padding: 14px 16px 16px;
+  box-shadow: 0 24px 60px rgba(20, 22, 45, 0.35);
+}
+#player-video {
+  width: 100%; max-height: 72vh;
+  border-radius: var(--radius); background: #000; outline: none;
+}
+#player-iframe {
+  width: 100%; aspect-ratio: 16/9; display: none;
+  border: none; border-radius: var(--radius); background: #000;
+}
+.p-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2px 10px;
+}
+.p-title {
+  font-size: 15px; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.p-close {
+  background: none; border: none; color: var(--text-dim);
+  font-size: 28px; line-height: 1; cursor: pointer; padding: 2px 6px;
+}
+.p-close:hover { color: var(--text); }
+.p-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 12px 2px 0; flex-wrap: wrap;
+}
+.p-stats { font-size: 13px; color: var(--text-dim); display: flex; gap: 16px; }
+.p-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.p-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border: 1px solid var(--border); border-radius: 9px;
+  background: var(--bg-2); color: var(--text); font-size: 13px;
+  font-weight: 600; cursor: pointer; text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.p-btn:hover { border-color: var(--accent); color: var(--accent); }
+.p-btn svg { width: 14px; height: 14px; stroke: currentColor; }
+.p-btn.grad { background: var(--grad); border-color: transparent; color: #fff; }
+.p-btn.grad:hover { color: #fff; box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4); }
+.quality-group { display: flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+.quality-group button {
+  padding: 8px 14px; border: none; background: var(--bg-2);
+  color: var(--text-dim); font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.quality-group button.active { background: var(--grad); color: #fff; }
+.dl-menu-wrap { position: relative; }
+.dl-menu {
+  position: absolute; bottom: calc(100% + 8px); right: 0;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 10px; box-shadow: var(--shadow);
+  min-width: 190px; overflow: hidden; display: none; z-index: 210;
+}
+.dl-menu.open { display: block; }
+.dl-menu a {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 10px 14px; font-size: 13px; color: var(--text);
+  text-decoration: none;
+}
+.dl-menu a:hover { background: var(--bg-3); }
+.dl-menu a span:last-child { color: var(--text-faint); font-size: 11px; }
+.p-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--bg-2); border: 1px solid var(--border);
+  color: var(--text); font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(20, 22, 45, 0.25);
+  transition: background 0.15s, color 0.15s;
+}
+.p-nav:hover { background: var(--grad); color: #fff; border-color: transparent; }
+.p-nav.prev { left: -60px; }
+.p-nav.next { right: -60px; }
+.p-nav:disabled { opacity: 0.25; cursor: default; }
+@media (max-width: 1140px) {
+  .p-nav.prev { left: 8px; }
+  .p-nav.next { right: 8px; }
+}
+.p-tags { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 2px 0; }
+.p-tag {
+  padding: 4px 11px; border-radius: 999px; cursor: pointer;
+  background: var(--bg-3); border: 1px solid var(--border);
+  font-size: 11.5px; color: var(--text-dim);
+  transition: all 0.12s;
+}
+.p-tag:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-2); }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--text); border: none;
+  padding: 11px 22px; border-radius: 10px; font-size: 13px; color: #fff;
+  z-index: 400; display: none; box-shadow: var(--shadow);
+}
+
+footer {
+  text-align: center; padding: 24px 20px 34px;
+  font-size: 12px; color: var(--text-faint);
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 640px) {
+  .header-inner { gap: 10px; padding: 10px 12px; }
+  .brand h1 { display: none; }
+  #results { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  main { padding: 6px 12px 30px; }
+  #cats { padding: 8px 12px 10px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand" id="brand" title="Home">
+      <div class="logo">▶</div>
+      <h1>Suneo Island</h1>
+    </div>
+    <form id="search-form" autocomplete="off">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="search-input" placeholder="Search videos, tags, creators...">
+        <button type="button" id="search-clear" title="Clear">&times;</button>
+        <div id="suggest"></div>
+      </div>
+      <select id="order-select" title="Sort by">
+        <option value="trending">🔥 Trending</option>
+        <option value="top">⭐ Top All Time</option>
+        <option value="top7">📅 Top This Week</option>
+        <option value="top28">🗓️ Top This Month</option>
+        <option value="latest">🆕 Latest</option>
+        <option value="score">👍 Top Rated</option>
+      </select>
+      <button type="submit" class="btn-primary">Search</button>
+    </form>
+  </div>
+  <nav id="cats" aria-label="Categories"></nav>
+</header>
+
+<main>
+  <div class="result-bar">
+    <span id="result-info"></span>
+    <span id="page-info"></span>
+  </div>
+  <div id="error"><span id="error-msg"></span><button id="retry-btn">Retry</button></div>
+  <div id="results"></div>
+  <div id="loading" style="display:none;"><div class="spinner"></div>Loading...</div>
+  <div id="load-more-wrap" style="display:none;">
+    <button id="load-more">Load more</button>
+  </div>
+</main>
+
+<footer>Suneo Island — local viewer. Content is streamed from RedGIFs; nothing is hosted here.</footer>
+
+<div id="player" role="dialog" aria-modal="true">
+  <div class="wrap">
+    <div class="p-top">
+      <div class="p-title" id="p-title"></div>
+      <button class="p-close" id="player-close" title="Close (Esc)">&times;</button>
+    </div>
+    <video id="player-video" controls loop playsinline></video>
+    <iframe id="player-iframe" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <div class="p-bottom">
+      <div class="p-stats" id="p-stats"></div>
+      <div class="p-actions">
+        <div class="quality-group" id="quality-group">
+          <button data-q="hd" class="active">HD</button>
+          <button data-q="sd">SD</button>
+        </div>
+        <div class="dl-menu-wrap">
+          <button class="p-btn grad" id="dl-toggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+            Download
+          </button>
+          <div class="dl-menu" id="dl-menu"></div>
+        </div>
+        <a class="p-btn" id="player-open" href="#" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 4h6v6M20 4L10 14M20 14v6H4V4h6"/></svg>
+          Source
+        </a>
+      </div>
+    </div>
+    <div class="p-tags" id="p-tags"></div>
+    <button class="p-nav prev" id="p-prev" title="Previous (←)">‹</button>
+    <button class="p-nav next" id="p-next" title="Next (→)">›</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+
+const FALLBACK_CATS = ['Trending', 'Funny', 'Amateur', 'Cute', 'Fitness', 'Cosplay',
+  'Dance', 'Asian', 'Latina', 'Blonde', 'Brunette', 'Redhead', 'Teen 18+', 'MILF',
+  'Big Ass', 'Big Tits', 'Petite', 'Lesbian', 'Public', 'POV'];
+
+const state = {
+  text: '', order: 'trending', page: 1, pages: 1,
+  items: [],            // flat list of gifs currently rendered
+  activeIdx: -1,        // index of item open in player
+  loading: false,
+};
+
+/* ---------------- utilities ---------------- */
+function showToast(msg, dur = 2600) {
+  const t = $('#toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(t._hid);
+  t._hid = setTimeout(() => t.style.display = 'none', dur);
+}
+// Only allow http(s) URLs from expected hosts (blocks javascript:/data: URLs)
+function safeUrl(url, allowedHost = 'redgifs.com') {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return '';
+    if (u.hostname !== allowedHost && !u.hostname.endsWith('.' + allowedHost)) return '';
+    return u.href;
+  } catch (_) { return ''; }
+}
+function fmtNum(n) {
+  if (!n && n !== 0) return '';
+  if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(n);
+}
+function fmtDur(s) {
+  if (!s) return '';
+  s = Math.round(s);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+function dlLink(url) { return '/api/download?url=' + encodeURIComponent(url); }
+
+/* ---------------- API ---------------- */
+async function apiSearch(text, order, page) {
+  const p = new URLSearchParams({ q: text, order, page: String(page), count: '40' });
+  const r = await fetch('/api/search?' + p);
+  if (!r.ok) {
+    let m = 'Search failed (' + r.status + ')';
+    try { const e = await r.json(); m = e.error || m; } catch (_) {}
+    throw new Error(m);
+  }
+  return r.json();
+}
+
+/* ---------------- categories ---------------- */
+async function loadCategories() {
+  let names = FALLBACK_CATS;
+  try {
+    const r = await fetch('/api/niches?count=24');
+    if (r.ok) {
+      const data = await r.json();
+      const niches = (data.niches || []).map(n => n.name || n.id).filter(Boolean);
+      if (niches.length >= 6) names = ['Trending', ...niches];
+    }
+  } catch (_) { /* fallback list */ }
+  const nav = $('#cats');
+  nav.innerHTML = '';
+  names.forEach(name => {
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = name;
+    if (name === 'Trending') b.classList.add('active');
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      b.classList.add('active');
+      const q = name === 'Trending' ? '' : name;
+      $('#search-input').value = q;
+      startSearch(q, $('#order-select').value);
+    });
+    nav.appendChild(b);
+  });
+}
+function syncChips(text) {
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active',
+      c.textContent.toLowerCase() === (text || 'trending').toLowerCase());
+  });
+}
+
+/* ---------------- grid ---------------- */
+function showSkeletons(n = 12) {
+  const c = $('#results');
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('div');
+    s.className = 'skeleton';
+    c.appendChild(s);
+  }
+}
+function clearSkeletons() {
+  document.querySelectorAll('.skeleton').forEach(s => s.remove());
+}
+
+function makeCard(g, idx) {
+  const poster = safeUrl(g.urls?.poster || g.urls?.thumbnail || '');
+  const hd = safeUrl(g.urls?.hd || '');
+  const sd = safeUrl(g.urls?.sd || '');
+  const title = g.title || (g.userName ? '@' + g.userName : g.id || 'Untitled');
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.tabIndex = 0;
+
+  const img = document.createElement('img');
+  if (poster) img.src = poster;
+  img.alt = title;
+  img.loading = 'lazy';
+  card.appendChild(img);
+
+  const badges = document.createElement('div');
+  badges.className = 'badges';
+  const dur = document.createElement('span');
+  dur.className = 'badge';
+  dur.textContent = fmtDur(g.duration) || 'GIF';
+  badges.appendChild(dur);
+  if (hd) {
+    const q = document.createElement('span');
+    q.className = 'badge hd';
+    q.textContent = 'HD';
+    badges.appendChild(q);
+  }
+  card.appendChild(badges);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'play-overlay';
+  overlay.innerHTML = '<div class="play-circle"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+  card.appendChild(overlay);
+
+  const bottom = document.createElement('div');
+  bottom.className = 'bottom';
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  const t = document.createElement('div');
+  t.className = 'title';
+  t.textContent = title;
+  meta.appendChild(t);
+  const stats = document.createElement('div');
+  stats.className = 'stats';
+  const bits = [];
+  if (g.views) bits.push('👁 ' + fmtNum(g.views));
+  if (g.likes) bits.push('❤ ' + fmtNum(g.likes));
+  stats.textContent = bits.join('   ');
+  meta.appendChild(stats);
+  bottom.appendChild(meta);
+
+  const best = hd || sd;
+  if (best) {
+    const dl = document.createElement('button');
+    dl.className = 'dl-btn';
+    dl.title = 'Download';
+    dl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>';
+    dl.addEventListener('click', e => {
+      e.stopPropagation();
+      const a = document.createElement('a');
+      a.href = dlLink(best);
+      a.download = (g.id || 'video') + '.mp4';
+      a.click();
+      showToast('Download started');
+    });
+    bottom.appendChild(dl);
+  }
+  card.appendChild(bottom);
+
+  card.addEventListener('click', () => openPlayer(idx));
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter') openPlayer(idx);
+  });
+  return card;
+}
+
+function appendResults(gifs) {
+  const c = $('#results');
+  const start = state.items.length;
+  gifs.forEach((g, i) => c.appendChild(makeCard(g, start + i)));
+  state.items.push(...gifs);
+}
+
+/* ---------------- search flow ---------------- */
+async function loadPage(page, { append = false } = {}) {
+  if (state.loading) return;
+  state.loading = true;
+  $('#error').style.display = 'none';
+  if (!append) {
+    $('#results').innerHTML = '';
+    state.items = [];
+    window.scrollTo({ top: 0 });
+    showSkeletons();
+  } else {
+    $('#load-more').disabled = true;
+    $('#load-more').textContent = 'Loading...';
+  }
+  try {
+    const data = await apiSearch(state.text || 'trending', state.order, page);
+    clearSkeletons();
+    const gifs = data.gifs || [];
+    state.page = data.page || page;
+    state.pages = data.pages || 1;
+    if (!append && !gifs.length) {
+      $('#error').style.display = 'block';
+      $('#error-msg').textContent = 'No results found. Try a different search.';
+    } else {
+      appendResults(gifs);
+    }
+    $('#result-info').textContent = data.total
+      ? fmtNum(data.total) + ' results' + (state.text ? ' for "' + state.text + '"' : '')
+      : '';
+    $('#page-info').textContent = state.pages > 1 ? 'Page ' + state.page + ' of ' + fmtNum(state.pages) : '';
+    $('#load-more-wrap').style.display = state.page < state.pages ? 'block' : 'none';
+  } catch (err) {
+    clearSkeletons();
+    if (!append) {
+      $('#error').style.display = 'block';
+      $('#error-msg').textContent = err.message;
+    } else {
+      showToast(err.message);
+    }
+  } finally {
+    state.loading = false;
+    $('#load-more').disabled = false;
+    $('#load-more').textContent = 'Load more';
+  }
+}
+
+function startSearch(text, order) {
+  state.text = text.trim();
+  state.order = order;
+  syncChips(state.text);
+  loadPage(1);
+}
+
+/* infinite scroll — prefetch next page near the bottom */
+const sentinel = $('#load-more-wrap');
+new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting && !state.loading && state.page < state.pages) {
+    loadPage(state.page + 1, { append: true });
+  }
+}, { rootMargin: '600px' }).observe(sentinel);
+$('#load-more').addEventListener('click', () => loadPage(state.page + 1, { append: true }));
+
+/* ---------------- player ---------------- */
+const video = $('#player-video');
+const iframeEl = $('#player-iframe');
+let currentQuality = 'hd';
+
+function sourcesFor(g) {
+  return {
+    hd: safeUrl(g.urls?.hd || ''),
+    sd: safeUrl(g.urls?.sd || ''),
+    poster: safeUrl(g.urls?.poster || ''),
+    embed: safeUrl(g.urls?.html || '') || 'https://www.redgifs.com/ifr/' + encodeURIComponent(g.id || ''),
+  };
+}
+
+function openPlayer(idx) {
+  const g = state.items[idx];
+  if (!g) return;
+  state.activeIdx = idx;
+  const src = sourcesFor(g);
+
+  $('#p-title').textContent = g.title || (g.userName ? '@' + g.userName : g.id || '');
+  const stats = [];
+  if (g.views) stats.push('👁 ' + fmtNum(g.views) + ' views');
+  if (g.likes) stats.push('❤ ' + fmtNum(g.likes) + ' likes');
+  if (g.userName) stats.push('by @' + g.userName);
+  $('#p-stats').textContent = stats.join('  ·  ');
+
+  // quality buttons — hide the group if only one source exists
+  const qg = $('#quality-group');
+  qg.style.display = (src.hd && src.sd) ? 'flex' : 'none';
+  currentQuality = src.hd ? 'hd' : 'sd';
+  qg.querySelectorAll('button').forEach(b =>
+    b.classList.toggle('active', b.dataset.q === currentQuality));
+
+  // download menu with every available source
+  const menu = $('#dl-menu');
+  menu.innerHTML = '';
+  const opts = [
+    ['HD Video (MP4)', src.hd, '.mp4', 'best quality'],
+    ['SD Video (MP4)', src.sd, '.mp4', 'smaller file'],
+    ['Poster (JPG)', src.poster, '.jpg', 'still image'],
+  ];
+  let hasDl = false;
+  opts.forEach(([label, url, ext, note]) => {
+    if (!url) return;
+    hasDl = true;
+    const a = document.createElement('a');
+    a.href = dlLink(url);
+    a.download = (g.id || 'video') + ext;
+    a.innerHTML = '<span></span><span></span>';
+    a.children[0].textContent = label;
+    a.children[1].textContent = note;
+    a.addEventListener('click', () => {
+      menu.classList.remove('open');
+      showToast('Download started');
+    });
+    menu.appendChild(a);
+  });
+  $('#dl-toggle').style.display = hasDl ? '' : 'none';
+
+  $('#player-open').href = src.embed;
+
+  // tags
+  const tagsEl = $('#p-tags');
+  tagsEl.innerHTML = '';
+  (g.tags || []).slice(0, 10).forEach(tag => {
+    const b = document.createElement('button');
+    b.className = 'p-tag';
+    b.textContent = '#' + tag;
+    b.addEventListener('click', () => {
+      closePlayer();
+      $('#search-input').value = tag;
+      startSearch(tag, state.order);
+    });
+    tagsEl.appendChild(b);
+  });
+
+  playSource(src);
+  $('#p-prev').disabled = idx <= 0;
+  $('#p-next').disabled = idx >= state.items.length - 1;
+  $('#player').classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  // auto-fetch next page so "next" keeps working near the end
+  if (idx >= state.items.length - 5 && state.page < state.pages && !state.loading) {
+    loadPage(state.page + 1, { append: true });
+  }
+}
+
+// Autoplay applies ONLY to the video open in the player — grid stays static.
+function playSource(src) {
+  const url = (currentQuality === 'hd' && src.hd) ? src.hd : (src.sd || src.hd);
+  if (url) {
+    iframeEl.style.display = 'none';
+    iframeEl.src = '';
+    video.style.display = '';
+    if (src.poster) video.poster = src.poster;
+    video.src = url;
+    video.play().catch(() => { /* browser may require a gesture; controls remain */ });
+    video.onerror = () => {
+      // signed URL expired or blocked — fall back to the official embed
+      video.style.display = 'none';
+      video.removeAttribute('src'); video.load();
+      iframeEl.style.display = 'block';
+      iframeEl.src = src.embed;
+    };
+  } else {
+    video.style.display = 'none';
+    iframeEl.style.display = 'block';
+    iframeEl.src = src.embed;
+  }
+}
+
+function closePlayer() {
+  video.pause();
+  video.removeAttribute('src'); video.load();
+  iframeEl.src = '';
+  $('#dl-menu').classList.remove('open');
+  $('#player').classList.remove('active');
+  document.body.style.overflow = '';
+  state.activeIdx = -1;
+}
+
+function stepPlayer(dir) {
+  const next = state.activeIdx + dir;
+  if (next >= 0 && next < state.items.length) openPlayer(next);
+}
+
+$('#quality-group').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const g = state.items[state.activeIdx];
+  if (!g) return;
+  currentQuality = b.dataset.q;
+  $('#quality-group').querySelectorAll('button').forEach(x =>
+    x.classList.toggle('active', x === b));
+  const t = video.currentTime;
+  playSource(sourcesFor(g));
+  video.currentTime = t;
+});
+$('#dl-toggle').addEventListener('click', e => {
+  e.stopPropagation();
+  $('#dl-menu').classList.toggle('open');
+});
+document.addEventListener('click', () => $('#dl-menu').classList.remove('open'));
+$('#player-close').addEventListener('click', closePlayer);
+$('#player').addEventListener('click', e => {
+  if (e.target === $('#player')) closePlayer();
+});
+$('#p-prev').addEventListener('click', () => stepPlayer(-1));
+$('#p-next').addEventListener('click', () => stepPlayer(1));
+
+document.addEventListener('keydown', e => {
+  if (!$('#player').classList.contains('active')) return;
+  if (e.key === 'Escape') closePlayer();
+  else if (e.key === 'ArrowLeft') stepPlayer(-1);
+  else if (e.key === 'ArrowRight') stepPlayer(1);
+  else if (e.key === ' ' && document.activeElement !== video) {
+    e.preventDefault();
+    video.paused ? video.play() : video.pause();
+  }
+});
+
+/* ---------------- search box extras ---------------- */
+const input = $('#search-input');
+const suggestBox = $('#suggest');
+let suggestTimer = null, suggestSel = -1;
+
+input.addEventListener('input', () => {
+  $('#search-clear').style.display = input.value ? 'block' : 'none';
+  clearTimeout(suggestTimer);
+  const q = input.value.trim();
+  if (q.length < 2) { suggestBox.style.display = 'none'; return; }
+  suggestTimer = setTimeout(async () => {
+    try {
+      const r = await fetch('/api/suggest?q=' + encodeURIComponent(q));
+      if (!r.ok) return;
+      const data = await r.json();
+      const raw = Array.isArray(data) ? data : (data.tags || []);
+      const tags = raw.slice(0, 8);
+      if (!tags.length) { suggestBox.style.display = 'none'; return; }
+      suggestBox.innerHTML = '';
+      suggestSel = -1;
+      tags.forEach(t => {
+        const name = t.text || t.name || t;
+        const item = document.createElement('div');
+        item.className = 's-item';
+        const n = document.createElement('span');
+        n.textContent = name;
+        item.appendChild(n);
+        if (t.gifs) {
+          const c = document.createElement('span');
+          c.className = 'cnt';
+          c.textContent = fmtNum(t.gifs);
+          item.appendChild(c);
+        }
+        item.addEventListener('mousedown', e => {
+          e.preventDefault();
+          input.value = name;
+          suggestBox.style.display = 'none';
+          startSearch(name, $('#order-select').value);
+        });
+        suggestBox.appendChild(item);
+      });
+      suggestBox.style.display = 'block';
+    } catch (_) {}
+  }, 250);
+});
+input.addEventListener('blur', () => setTimeout(() => suggestBox.style.display = 'none', 150));
+input.addEventListener('keydown', e => {
+  const items = suggestBox.querySelectorAll('.s-item');
+  if (!items.length || suggestBox.style.display === 'none') return;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    suggestSel = e.key === 'ArrowDown'
+      ? Math.min(suggestSel + 1, items.length - 1)
+      : Math.max(suggestSel - 1, 0);
+    items.forEach((it, i) => it.classList.toggle('sel', i === suggestSel));
+    if (suggestSel >= 0) input.value = items[suggestSel].firstChild.textContent;
+  } else if (e.key === 'Escape') {
+    suggestBox.style.display = 'none';
+  }
+});
+
+$('#search-clear').addEventListener('click', () => {
+  input.value = '';
+  $('#search-clear').style.display = 'none';
+  input.focus();
+});
+$('#search-form').addEventListener('submit', e => {
+  e.preventDefault();
+  suggestBox.style.display = 'none';
+  startSearch(input.value, $('#order-select').value);
+});
+$('#order-select').addEventListener('change', () =>
+  startSearch(state.text, $('#order-select').value));
+$('#brand').addEventListener('click', () => {
+  input.value = '';
+  $('#order-select').value = 'trending';
+  startSearch('', 'trending');
+});
+$('#retry-btn').addEventListener('click', () => loadPage(state.page || 1));
+
+/* ---------------- init ---------------- */
+loadCategories();
+startSearch('', 'trending');
+</script>
+</body>
+</html>
