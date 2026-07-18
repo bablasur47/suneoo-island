@@ -5,22 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ef4444">
+<link rel="icon" type="image/webp" href="/logo.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Suneo Island</title>
 <style>
 :root {
-  --bg: #f6f7fb;
+  --bg: #f7f8fa;
   --bg-2: #ffffff;
-  --bg-3: #eff1f8;
-  --border: #e5e7f0;
-  --border-hi: #c9cee2;
-  --text: #1d2136;
-  --text-dim: #5b6178;
-  --text-faint: #969cb3;
-  --accent: #7c3aed;
-  --accent-2: #ec4899;
-  --grad: linear-gradient(135deg, #7c3aed, #ec4899, #f97316);
-  --radius: 12px;
-  --shadow: 0 10px 30px rgba(35, 40, 80, 0.12);
+  --bg-3: #eff1f5;
+  --border: #e6e8ee;
+  --border-hi: #cdd2dd;
+  --text: #1a2340;
+  --text-dim: #5a6478;
+  --text-faint: #97a0b3;
+  --accent: #ef4444;
+  --accent-2: #f97316;
+  --grad: linear-gradient(135deg, #ef4444, #f97316);
+  --radius: 14px;
+  --shadow: 0 14px 32px rgba(23, 32, 58, 0.13);
 }
 @keyframes gradShift {
   0% { background-position: 0% 50%; }
@@ -30,10 +35,10 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scrollbar-color: var(--border-hi) var(--bg); }
 body {
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
   background:
-    radial-gradient(700px 400px at 85% -50px, rgba(236, 72, 153, 0.07), transparent 70%),
-    radial-gradient(700px 400px at 10% -50px, rgba(124, 58, 237, 0.07), transparent 70%),
+    radial-gradient(700px 380px at 88% -60px, rgba(249, 115, 22, 0.06), transparent 70%),
+    radial-gradient(700px 380px at 8% -60px, rgba(59, 130, 246, 0.06), transparent 70%),
     var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -50,28 +55,29 @@ header {
 }
 header::before {
   content: ''; display: block; height: 3px;
-  background: linear-gradient(90deg, #7c3aed, #ec4899, #f97316, #7c3aed);
+  background: linear-gradient(90deg, #ef4444, #f97316, #3b82f6, #ef4444);
   background-size: 300% 100%;
-  animation: gradShift 6s linear infinite;
+  animation: gradShift 8s linear infinite;
 }
 .header-inner {
   max-width: 1500px; margin: 0 auto;
-  padding: 12px 20px;
-  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 13px 20px;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
 }
 .brand {
   display: flex; align-items: center; gap: 10px;
   cursor: pointer; user-select: none; white-space: nowrap;
 }
 .brand .logo {
-  width: 34px; height: 34px; border-radius: 9px;
-  background: var(--grad);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; color: #fff;
-  box-shadow: 0 3px 12px rgba(124, 58, 237, 0.35);
+  width: 40px; height: 40px; border-radius: 50%;
+  object-fit: cover; display: block;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px var(--accent), 0 4px 12px rgba(239, 68, 68, 0.28);
+  transition: transform 0.2s;
 }
+.brand:hover .logo { transform: scale(1.08) rotate(-4deg); }
 .brand h1 {
-  font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;
+  font-size: 1.3rem; font-weight: 800; letter-spacing: -0.03em;
   background: var(--grad);
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -87,16 +93,18 @@ header::before {
   stroke: var(--text-faint); pointer-events: none;
 }
 #search-input {
-  width: 100%; padding: 10px 38px 10px 36px;
-  border: 1px solid var(--border); border-radius: 10px;
-  background: var(--bg-2); color: var(--text);
+  width: 100%; padding: 11px 38px 11px 38px;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: var(--bg-3); color: var(--text);
   font-size: 14px; outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 #search-input:focus {
+  background: var(--bg-2);
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
 }
+.search-box svg { left: 15px; }
 #search-clear {
   position: absolute; right: 8px;
   background: none; border: none; color: var(--text-faint);
@@ -116,19 +124,19 @@ header::before {
 #suggest .s-item:hover, #suggest .s-item.sel { background: var(--bg-3); }
 #suggest .s-item .cnt { color: var(--text-faint); font-size: 12px; }
 select {
-  padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 14px; border: 1px solid var(--border); border-radius: 999px;
   background: var(--bg-2); color: var(--text); font-size: 13px;
-  outline: none; cursor: pointer;
+  font-weight: 500; outline: none; cursor: pointer;
 }
 select:focus { border-color: var(--accent); }
 .btn-primary {
-  padding: 10px 22px; border: none; border-radius: 10px;
+  padding: 11px 26px; border: none; border-radius: 999px;
   background: var(--grad); color: #fff;
   font-size: 14px; font-weight: 700; cursor: pointer;
   transition: transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 3px 12px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 3px 12px rgba(239, 68, 68, 0.3);
 }
-.btn-primary:hover { box-shadow: 0 5px 20px rgba(236, 72, 153, 0.4); }
+.btn-primary:hover { box-shadow: 0 5px 20px rgba(249, 115, 22, 0.4); }
 .btn-primary:active { transform: scale(0.97); }
 
 /* ---------- Category chips ---------- */
@@ -141,7 +149,7 @@ select:focus { border-color: var(--accent); }
 #cats::-webkit-scrollbar { display: none; }
 .chip {
   flex: 0 0 auto;
-  padding: 7px 15px; border-radius: 999px;
+  padding: 8px 16px; border-radius: 999px;
   background: var(--bg-2); border: 1px solid var(--border);
   color: var(--text-dim); font-size: 13px; font-weight: 600;
   cursor: pointer; white-space: nowrap;
@@ -151,36 +159,47 @@ select:focus { border-color: var(--accent); }
 .chip:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
 .chip.active {
   background: var(--grad); border-color: transparent;
-  color: #fff; box-shadow: 0 3px 12px rgba(124, 58, 237, 0.35);
+  color: #fff; box-shadow: 0 3px 12px rgba(239, 68, 68, 0.35);
 }
 
 /* ---------- Main / grid ---------- */
 main { max-width: 1500px; margin: 0 auto; padding: 8px 20px 40px; }
 .result-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 2px 14px; font-size: 13px; color: var(--text-faint);
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; padding: 16px 2px 16px;
 }
+#result-info {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#page-info { font-size: 13px; color: var(--text-faint); flex: 0 0 auto; }
 #results {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
 }
 .card {
   border-radius: var(--radius); overflow: hidden; cursor: pointer;
-  position: relative; aspect-ratio: 16/10;
   background: var(--bg-2); border: 1px solid var(--border);
-  box-shadow: 0 2px 8px rgba(35, 40, 80, 0.07);
+  box-shadow: 0 1px 4px rgba(23, 32, 58, 0.06);
+  display: flex; flex-direction: column;
   transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
 }
 .card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   border-color: var(--border-hi);
   box-shadow: var(--shadow);
 }
-.card img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-  background: var(--bg-3);
+.card .thumb {
+  position: relative; aspect-ratio: 16/10;
+  background: var(--bg-3); overflow: hidden;
 }
+.card .thumb img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.35s ease;
+}
+.card:hover .thumb img { transform: scale(1.05); }
 .card .badges {
   position: absolute; top: 8px; left: 8px; right: 8px;
   display: flex; justify-content: space-between; pointer-events: none;
@@ -208,32 +227,30 @@ main { max-width: 1500px; margin: 0 auto; padding: 8px 20px 40px; }
 }
 .card:hover .play-circle { transform: scale(1.08); }
 .play-circle svg { width: 20px; height: 20px; fill: #fff; margin-left: 3px; }
-.card .bottom {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 34px 10px 8px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.88));
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 8px;
+.card .info {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 10px; padding: 11px 12px 12px;
 }
-.card .meta { min-width: 0; }
+.card .meta { min-width: 0; flex: 1; }
 .card .title {
-  font-size: 13px; font-weight: 600; color: #f2f2f2;
+  font-size: 13.5px; font-weight: 600; color: var(--text);
+  line-height: 1.35;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .card .stats {
-  font-size: 11px; color: #b8b8c8; margin-top: 2px;
+  font-size: 12px; color: var(--text-faint); margin-top: 3px;
   display: flex; gap: 10px;
 }
 .card .dl-btn {
   flex: 0 0 auto;
-  width: 32px; height: 32px; border-radius: 8px;
-  background: rgba(255, 255, 255, 0.12); border: none;
-  backdrop-filter: blur(4px);
+  width: 32px; height: 32px; border-radius: 9px;
+  background: var(--bg-3); border: none;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; opacity: 0; transition: opacity 0.18s, background 0.15s;
+  cursor: pointer; transition: background 0.15s, transform 0.1s;
 }
-.card:hover .dl-btn { opacity: 1; }
-.card .dl-btn:hover { background: var(--accent); }
-.card .dl-btn svg { width: 15px; height: 15px; stroke: #fff; }
+.card .dl-btn:hover { background: var(--accent); transform: scale(1.06); }
+.card .dl-btn svg { width: 15px; height: 15px; stroke: var(--text-dim); }
+.card .dl-btn:hover svg { stroke: #fff; }
 
 /* ---------- States ---------- */
 #loading { text-align: center; padding: 70px 20px; color: var(--text-faint); }
@@ -254,7 +271,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 8px 20px 40px; }
 }
 #error button:hover { border-color: var(--accent); color: var(--accent); }
 .skeleton {
-  border-radius: var(--radius); aspect-ratio: 16/10;
+  border-radius: var(--radius); aspect-ratio: 16/12.4;
   border: 1px solid var(--border);
   background: linear-gradient(100deg, var(--bg-3) 40%, #fff 50%, var(--bg-3) 60%);
   background-size: 200% 100%;
@@ -326,7 +343,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 8px 20px 40px; }
 .p-btn:hover { border-color: var(--accent); color: var(--accent); }
 .p-btn svg { width: 14px; height: 14px; stroke: currentColor; }
 .p-btn.grad { background: var(--grad); border-color: transparent; color: #fff; }
-.p-btn.grad:hover { color: #fff; box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4); }
+.p-btn.grad:hover { color: #fff; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4); }
 .quality-group { display: flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
 .quality-group button {
   padding: 8px 14px; border: none; background: var(--bg-2);
@@ -401,7 +418,7 @@ footer {
 <header>
   <div class="header-inner">
     <div class="brand" id="brand" title="Home">
-      <div class="logo">▶</div>
+      <img class="logo" src="/logo.webp" alt="Suneo Island">
       <h1>Suneo Island</h1>
     </div>
     <form id="search-form" autocomplete="off">
@@ -412,12 +429,12 @@ footer {
         <div id="suggest"></div>
       </div>
       <select id="order-select" title="Sort by">
-        <option value="trending">🔥 Trending</option>
-        <option value="top">⭐ Top All Time</option>
-        <option value="top7">📅 Top This Week</option>
-        <option value="top28">🗓️ Top This Month</option>
-        <option value="latest">🆕 Latest</option>
-        <option value="score">👍 Top Rated</option>
+        <option value="trending">Trending</option>
+        <option value="top">Top All Time</option>
+        <option value="top7">Top This Week</option>
+        <option value="top28">Top This Month</option>
+        <option value="latest">Latest</option>
+        <option value="score">Top Rated</option>
       </select>
       <button type="submit" class="btn-primary">Search</button>
     </form>
@@ -590,11 +607,14 @@ function makeCard(g, idx) {
   card.className = 'card';
   card.tabIndex = 0;
 
+  const thumb = document.createElement('div');
+  thumb.className = 'thumb';
+
   const img = document.createElement('img');
   if (poster) img.src = poster;
   img.alt = title;
   img.loading = 'lazy';
-  card.appendChild(img);
+  thumb.appendChild(img);
 
   const badges = document.createElement('div');
   badges.className = 'badges';
@@ -608,15 +628,16 @@ function makeCard(g, idx) {
     q.textContent = 'HD';
     badges.appendChild(q);
   }
-  card.appendChild(badges);
+  thumb.appendChild(badges);
 
   const overlay = document.createElement('div');
   overlay.className = 'play-overlay';
   overlay.innerHTML = '<div class="play-circle"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
-  card.appendChild(overlay);
+  thumb.appendChild(overlay);
+  card.appendChild(thumb);
 
-  const bottom = document.createElement('div');
-  bottom.className = 'bottom';
+  const info = document.createElement('div');
+  info.className = 'info';
   const meta = document.createElement('div');
   meta.className = 'meta';
   const t = document.createElement('div');
@@ -626,11 +647,11 @@ function makeCard(g, idx) {
   const stats = document.createElement('div');
   stats.className = 'stats';
   const bits = [];
-  if (g.views) bits.push('👁 ' + fmtNum(g.views));
-  if (g.likes) bits.push('❤ ' + fmtNum(g.likes));
-  stats.textContent = bits.join('   ');
+  if (g.views) bits.push(fmtNum(g.views) + ' views');
+  if (g.likes) bits.push(fmtNum(g.likes) + ' likes');
+  stats.textContent = bits.join(' · ');
   meta.appendChild(stats);
-  bottom.appendChild(meta);
+  info.appendChild(meta);
 
   const best = hd || sd;
   if (best) {
@@ -646,9 +667,9 @@ function makeCard(g, idx) {
       a.click();
       showToast('Download started');
     });
-    bottom.appendChild(dl);
+    info.appendChild(dl);
   }
-  card.appendChild(bottom);
+  card.appendChild(info);
 
   card.addEventListener('click', () => openPlayer(idx));
   card.addEventListener('keydown', e => {
@@ -690,10 +711,12 @@ async function loadPage(page, { append = false } = {}) {
     } else {
       appendResults(gifs);
     }
-    $('#result-info').textContent = data.total
-      ? fmtNum(data.total) + ' results' + (state.text ? ' for "' + state.text + '"' : '')
+    $('#result-info').textContent = state.text
+      ? 'Results for “' + state.text + '”'
+      : 'Trending Now';
+    $('#page-info').textContent = data.total
+      ? fmtNum(data.total) + ' videos' + (state.pages > 1 ? ' · Page ' + state.page : '')
       : '';
-    $('#page-info').textContent = state.pages > 1 ? 'Page ' + state.page + ' of ' + fmtNum(state.pages) : '';
     $('#load-more-wrap').style.display = state.page < state.pages ? 'block' : 'none';
   } catch (err) {
     clearSkeletons();

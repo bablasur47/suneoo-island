@@ -70,6 +70,13 @@ def index():
     return resp
 
 
+@app.route('/logo.webp')
+def logo():
+    resp = send_from_directory('.', 'logo.webp')
+    resp.headers['Cache-Control'] = 'public, max-age=604800'
+    return resp
+
+
 @app.route('/api/search')
 def search():
     q = request.args.get('q', '').strip() or 'trending'
