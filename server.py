@@ -19,6 +19,8 @@ ALLOWED_DOWNLOAD_HOSTS = {
     'thumbs4.redgifs.com',
 }
 ALLOWED_ORDERS = {'trending', 'top', 'top7', 'top28', 'latest', 'score', 'best', 'new'}
+ALLOWED_CREATOR_ORDERS = {'trending', 'top', 'latest', 'best', 'subscribers'}
+USERNAME_RE = re.compile(r'^[\w.-]{1,64}$')
 ALLOWED_TYPES = {'g', 'i'}  # g = videos/gifs, i = images
 REQUEST_TIMEOUT = 15
 
@@ -115,6 +117,57 @@ def niches():
     except Exception:
         app.logger.exception('Niches fetch failed')
         return jsonify({'error': 'Niches unavailable'}), 502
+
+
+@app.route('/api/creators')
+def creators():
+    """Top verified creators list."""
+    order = request.args.get('order', 'subscribers')
+    if order not in ALLOWED_CREATOR_ORDERS:
+        order = 'subscribers'
+    try:
+        page = max(1, min(int(request.args.get('page', '1')), 100))
+    except ValueError:
+        page = 1
+    try:
+        data = api_get('/v1/creators/search',
+                       {'order': order, 'page': page, 'count': 40})
+        # Trim to the fields the client needs
+        items = [{
+            'username': c.get('username'),
+            'name': c.get('name') or c.get('username'),
+            'followers': c.get('followers', 0),
+            'gifs': c.get('publishedGifs') or c.get('gifs', 0),
+            'image': c.get('profileImageUrl') or '',
+            'verified': bool(c.get('verified')),
+        } for c in data.get('items', []) if c.get('username')]
+        return jsonify({'items': items, 'page': data.get('page', page),
+                        'pages': data.get('pages', 1)})
+    except Exception:
+        app.logger.exception('Creators fetch failed')
+        return jsonify({'error': 'Creators unavailable'}), 502
+
+
+@app.route('/api/user/<username>')
+def user_gifs(username):
+    """Videos from a single creator."""
+    if not USERNAME_RE.match(username):
+        return jsonify({'error': 'Invalid username'}), 400
+    try:
+        page = max(1, min(int(request.args.get('page', '1')), 1000))
+    except ValueError:
+        page = 1
+    try:
+        count = max(1, min(int(request.args.get('count', '40')), 80))
+    except ValueError:
+        count = 40
+    try:
+        data = api_get(f'/v2/users/{username}/search',
+                       {'order': 'best', 'page': page, 'count': count})
+        return jsonify(data)
+    except Exception:
+        app.logger.exception('User gifs fetch failed')
+        return jsonify({'error': 'Creator videos unavailable'}), 502
 
 
 @app.route('/api/suggest')

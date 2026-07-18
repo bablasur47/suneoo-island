@@ -139,14 +139,79 @@ select:focus { border-color: var(--accent); }
 .btn-primary:hover { box-shadow: 0 5px 20px rgba(249, 115, 22, 0.4); }
 .btn-primary:active { transform: scale(0.97); }
 
-/* ---------- Category chips ---------- */
-#cats {
+/* ---------- Nav row: menus + category chips ---------- */
+.nav-row {
   max-width: 1500px; margin: 0 auto;
-  padding: 10px 20px 12px;
+  padding: 8px 20px 12px;
+  display: flex; gap: 8px; align-items: center;
+}
+#cats {
+  flex: 1; min-width: 0;
   display: flex; gap: 8px; overflow-x: auto;
   scrollbar-width: none;
 }
 #cats::-webkit-scrollbar { display: none; }
+.menu-wrap { position: relative; flex: 0 0 auto; }
+.menu-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 15px; border-radius: 999px;
+  background: var(--text); border: 1px solid var(--text);
+  color: #fff; font-size: 13px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.15s;
+}
+.menu-btn:hover, .menu-btn.open { background: var(--accent); border-color: var(--accent); }
+.menu-btn .caret { font-size: 9px; opacity: 0.7; }
+.menu-panel {
+  position: absolute; top: calc(100% + 8px); left: 0;
+  width: min(560px, 90vw); max-height: 62vh; overflow-y: auto;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 14px; box-shadow: var(--shadow);
+  padding: 12px; display: none; z-index: 150;
+}
+.menu-panel.open { display: block; }
+.panel-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-faint);
+  padding: 2px 6px 10px;
+}
+.panel-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 4px;
+}
+.panel-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border: none; border-radius: 9px;
+  background: none; color: var(--text); font-size: 13px;
+  font-weight: 500; cursor: pointer; text-align: left;
+  transition: background 0.12s;
+  min-width: 0;
+}
+.panel-item:hover { background: var(--bg-3); }
+.panel-item.active { background: var(--accent); color: #fff; }
+.panel-item .flag { font-size: 17px; flex: 0 0 auto; }
+.panel-item .lbl {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.panel-item img.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  object-fit: cover; flex: 0 0 auto; background: var(--bg-3);
+}
+.panel-item .sub {
+  display: block; font-size: 11px; color: var(--text-faint);
+  font-weight: 400;
+}
+.panel-item.active .sub { color: rgba(255, 255, 255, 0.8); }
+.panel-more {
+  display: block; width: 100%; margin-top: 8px;
+  padding: 9px; border: 1px solid var(--border); border-radius: 9px;
+  background: var(--bg-2); color: var(--text-dim);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.panel-more:hover { border-color: var(--accent); color: var(--accent); }
+.panel-note {
+  padding: 4px 6px 8px; font-size: 11.5px; color: var(--text-faint);
+}
 .chip {
   flex: 0 0 auto;
   padding: 8px 16px; border-radius: 999px;
@@ -409,7 +474,9 @@ footer {
   .brand h1 { display: none; }
   #results { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
   main { padding: 6px 12px 30px; }
-  #cats { padding: 8px 12px 10px; }
+  .nav-row { padding: 6px 12px 10px; flex-wrap: wrap; }
+  #cats { flex-basis: 100%; order: 10; }
+  .menu-panel { position: fixed; left: 12px; right: 12px; width: auto; top: auto; }
 }
 </style>
 </head>
@@ -439,7 +506,32 @@ footer {
       <button type="submit" class="btn-primary">Search</button>
     </form>
   </div>
-  <nav id="cats" aria-label="Categories"></nav>
+  <div class="nav-row">
+    <div class="menu-wrap">
+      <button class="menu-btn" id="cats-btn">📂 Categories <span class="caret">▼</span></button>
+      <div class="menu-panel" id="cats-panel">
+        <div class="panel-title">All Categories</div>
+        <div class="panel-grid" id="cats-grid"></div>
+      </div>
+    </div>
+    <div class="menu-wrap">
+      <button class="menu-btn" id="stars-btn">⭐ Pornstars <span class="caret">▼</span></button>
+      <div class="menu-panel" id="stars-panel">
+        <div class="panel-title">Top Creators</div>
+        <div class="panel-grid" id="stars-grid" style="grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));"></div>
+        <button class="panel-more" id="stars-more">Load more creators</button>
+      </div>
+    </div>
+    <div class="menu-wrap">
+      <button class="menu-btn" id="region-btn">🌍 All Regions <span class="caret">▼</span></button>
+      <div class="menu-panel" id="region-panel">
+        <div class="panel-title">Choose Region</div>
+        <div class="panel-note">Shows videos tagged with that nationality.</div>
+        <div class="panel-grid" id="region-grid"></div>
+      </div>
+    </div>
+    <nav id="cats" aria-label="Categories"></nav>
+  </div>
 </header>
 
 <main>
@@ -501,8 +593,80 @@ const FALLBACK_CATS = ['Trending', 'Funny', 'Amateur', 'Cute', 'Fitness', 'Cospl
   'Dance', 'Asian', 'Latina', 'Blonde', 'Brunette', 'Redhead', 'Teen 18+', 'MILF',
   'Big Ass', 'Big Tits', 'Petite', 'Lesbian', 'Public', 'POV'];
 
+// Full category list for the Categories menu (chips row stays short)
+const ALL_CATS = ['Amateur', 'Anal', 'Asian', 'BBC', 'BBW', 'BDSM', 'Big Ass',
+  'Big Dick', 'Big Tits', 'Bisexual', 'Blonde', 'Blowjob', 'Bondage', 'Brunette',
+  'Cam', 'College', 'Cosplay', 'Couple', 'Creampie', 'Cuckold', 'Cumshot', 'Curvy',
+  'Dance', 'Deepthroat', 'Doggystyle', 'Ebony', 'Feet', 'Femdom', 'Fingering',
+  'Fitness', 'Flashing', 'Gangbang', 'Gay', 'Goth', 'Hairy', 'Handjob', 'Hardcore',
+  'Hentai', 'Homemade', 'Hotwife', 'Interracial', 'JOI', 'Latina', 'Lesbian',
+  'Lingerie', 'Massage', 'Masturbation', 'Mature', 'MILF', 'Missionary', 'Office',
+  'Orgasm', 'Orgy', 'Outdoor', 'Pawg', 'Petite', 'Piercing', 'POV', 'Public',
+  'Pussy', 'Redhead', 'Riding', 'Rough', 'Shower', 'Small Tits', 'Solo', 'Squirt',
+  'Stockings', 'Swingers', 'Tattoo', 'Teen 18+', 'Threesome', 'Titfuck', 'Toys',
+  'Trans', 'Twerking', 'Upskirt', 'Vintage', 'Wet', 'Yoga Pants'];
+
+// Region -> search tag. Emoji flag + label shown in the menu.
+const REGIONS = [
+  ['', '🌍', 'All Regions'],
+  ['indian', '🇮🇳', 'India'],
+  ['american', '🇺🇸', 'USA'],
+  ['british', '🇬🇧', 'UK'],
+  ['japanese', '🇯🇵', 'Japan'],
+  ['korean', '🇰🇷', 'Korea'],
+  ['chinese', '🇨🇳', 'China'],
+  ['thai', '🇹🇭', 'Thailand'],
+  ['filipina', '🇵🇭', 'Philippines'],
+  ['indonesian', '🇮🇩', 'Indonesia'],
+  ['vietnamese', '🇻🇳', 'Vietnam'],
+  ['pakistani', '🇵🇰', 'Pakistan'],
+  ['bangladeshi', '🇧🇩', 'Bangladesh'],
+  ['arab', '🇸🇦', 'Arab'],
+  ['turkish', '🇹🇷', 'Turkey'],
+  ['persian', '🇮🇷', 'Iran'],
+  ['israeli', '🇮🇱', 'Israel'],
+  ['russian', '🇷🇺', 'Russia'],
+  ['ukrainian', '🇺🇦', 'Ukraine'],
+  ['polish', '🇵🇱', 'Poland'],
+  ['czech', '🇨🇿', 'Czechia'],
+  ['german', '🇩🇪', 'Germany'],
+  ['french', '🇫🇷', 'France'],
+  ['italian', '🇮🇹', 'Italy'],
+  ['spanish', '🇪🇸', 'Spain'],
+  ['portuguese', '🇵🇹', 'Portugal'],
+  ['dutch', '🇳🇱', 'Netherlands'],
+  ['swedish', '🇸🇪', 'Sweden'],
+  ['norwegian', '🇳🇴', 'Norway'],
+  ['danish', '🇩🇰', 'Denmark'],
+  ['finnish', '🇫🇮', 'Finland'],
+  ['greek', '🇬🇷', 'Greece'],
+  ['romanian', '🇷🇴', 'Romania'],
+  ['hungarian', '🇭🇺', 'Hungary'],
+  ['brazilian', '🇧🇷', 'Brazil'],
+  ['mexican', '🇲🇽', 'Mexico'],
+  ['colombian', '🇨🇴', 'Colombia'],
+  ['argentinian', '🇦🇷', 'Argentina'],
+  ['venezuelan', '🇻🇪', 'Venezuela'],
+  ['cuban', '🇨🇺', 'Cuba'],
+  ['canadian', '🇨🇦', 'Canada'],
+  ['australian', '🇦🇺', 'Australia'],
+  ['kiwi', '🇳🇿', 'New Zealand'],
+  ['african', '🌍', 'Africa'],
+  ['nigerian', '🇳🇬', 'Nigeria'],
+  ['south african', '🇿🇦', 'South Africa'],
+  ['egyptian', '🇪🇬', 'Egypt'],
+  ['moroccan', '🇲🇦', 'Morocco'],
+  ['ethiopian', '🇪🇹', 'Ethiopia'],
+  ['kenyan', '🇰🇪', 'Kenya'],
+  ['latina', '🌎', 'Latina'],
+  ['asian', '🌏', 'Asian'],
+  ['european', '🇪🇺', 'European'],
+];
+
 const state = {
   text: '', order: 'trending', page: 1, pages: 1,
+  region: '',           // region tag, '' = all
+  creator: null,        // username when browsing one creator's videos
   items: [],            // flat list of gifs currently rendered
   activeIdx: -1,        // index of item open in player
   loading: false,
@@ -539,8 +703,18 @@ function dlLink(url) { return '/api/download?url=' + encodeURIComponent(url); }
 
 /* ---------------- API ---------------- */
 async function apiSearch(text, order, page) {
-  const p = new URLSearchParams({ q: text, order, page: String(page), count: '40' });
-  const r = await fetch('/api/search?' + p);
+  // Creator mode: browse one user's uploads instead of tag search
+  let url;
+  if (state.creator) {
+    url = '/api/user/' + encodeURIComponent(state.creator) + '?' +
+      new URLSearchParams({ page: String(page), count: '40' });
+  } else {
+    // Combine region + query: "indian" + "milf" -> "indian milf"
+    const q = [state.region, text].filter(Boolean).join(' ').trim() || 'trending';
+    url = '/api/search?' +
+      new URLSearchParams({ q, order, page: String(page), count: '40' });
+  }
+  const r = await fetch(url);
   if (!r.ok) {
     let m = 'Search failed (' + r.status + ')';
     try { const e = await r.json(); m = e.error || m; } catch (_) {}
@@ -700,7 +874,7 @@ async function loadPage(page, { append = false } = {}) {
     $('#load-more').textContent = 'Loading...';
   }
   try {
-    const data = await apiSearch(state.text || 'trending', state.order, page);
+    const data = await apiSearch(state.text, state.order, page);
     clearSkeletons();
     const gifs = data.gifs || [];
     state.page = data.page || page;
@@ -711,9 +885,16 @@ async function loadPage(page, { append = false } = {}) {
     } else {
       appendResults(gifs);
     }
-    $('#result-info').textContent = state.text
-      ? 'Results for “' + state.text + '”'
-      : 'Trending Now';
+    const regionLabel = state.region
+      ? (REGIONS.find(r => r[0] === state.region) || ['', '', state.region])[2]
+      : '';
+    $('#result-info').textContent = state.creator
+      ? '@' + state.creator
+      : state.text
+        ? 'Results for “' + state.text + '”' + (regionLabel ? ' · ' + regionLabel : '')
+        : regionLabel
+          ? regionLabel + ' Videos'
+          : 'Trending Now';
     $('#page-info').textContent = data.total
       ? fmtNum(data.total) + ' videos' + (state.pages > 1 ? ' · Page ' + state.page : '')
       : '';
@@ -736,7 +917,16 @@ async function loadPage(page, { append = false } = {}) {
 function startSearch(text, order) {
   state.text = text.trim();
   state.order = order;
+  state.creator = null;   // leaving creator mode on any normal search
   syncChips(state.text);
+  loadPage(1);
+}
+
+function startCreator(username) {
+  state.creator = username;
+  state.text = '';
+  $('#search-input').value = '';
+  syncChips('');
   loadPage(1);
 }
 
@@ -912,6 +1102,130 @@ document.addEventListener('keydown', e => {
   }
 });
 
+/* ---------------- dropdown menus ---------------- */
+const MENUS = [
+  ['#cats-btn', '#cats-panel'],
+  ['#stars-btn', '#stars-panel'],
+  ['#region-btn', '#region-panel'],
+];
+function closeMenus(except) {
+  MENUS.forEach(([b, p]) => {
+    if (p === except) return;
+    $(b).classList.remove('open');
+    $(p).classList.remove('open');
+  });
+}
+MENUS.forEach(([b, p]) => {
+  $(b).addEventListener('click', e => {
+    e.stopPropagation();
+    const open = $(p).classList.contains('open');
+    closeMenus();
+    if (!open) { $(b).classList.add('open'); $(p).classList.add('open'); }
+  });
+  $(p).addEventListener('click', e => e.stopPropagation());
+});
+document.addEventListener('click', () => closeMenus());
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeMenus();
+});
+
+/* Categories menu */
+(function buildCatsMenu() {
+  const grid = $('#cats-grid');
+  ALL_CATS.forEach(name => {
+    const b = document.createElement('button');
+    b.className = 'panel-item';
+    const l = document.createElement('span');
+    l.className = 'lbl';
+    l.textContent = name;
+    b.appendChild(l);
+    b.addEventListener('click', () => {
+      closeMenus();
+      $('#search-input').value = name;
+      startSearch(name, $('#order-select').value);
+    });
+    grid.appendChild(b);
+  });
+})();
+
+/* Pornstars menu — loaded lazily on first open */
+let starsPage = 0, starsLoading = false;
+async function loadCreators() {
+  if (starsLoading) return;
+  starsLoading = true;
+  $('#stars-more').textContent = 'Loading...';
+  try {
+    const r = await fetch('/api/creators?order=subscribers&page=' + (starsPage + 1));
+    if (!r.ok) throw new Error();
+    const data = await r.json();
+    starsPage += 1;
+    const grid = $('#stars-grid');
+    (data.items || []).forEach(c => {
+      const b = document.createElement('button');
+      b.className = 'panel-item';
+      const img = document.createElement('img');
+      img.className = 'avatar';
+      img.loading = 'lazy';
+      const av = safeUrl(c.image);
+      if (av) img.src = av;
+      img.alt = '';
+      b.appendChild(img);
+      const l = document.createElement('span');
+      l.className = 'lbl';
+      l.textContent = c.name || c.username;
+      const sub = document.createElement('span');
+      sub.className = 'sub';
+      sub.textContent = fmtNum(c.followers) + ' followers · ' + fmtNum(c.gifs) + ' videos';
+      l.appendChild(sub);
+      b.appendChild(l);
+      b.addEventListener('click', () => {
+        closeMenus();
+        startCreator(c.username);
+      });
+      grid.appendChild(b);
+    });
+    $('#stars-more').style.display =
+      (data.page < data.pages) ? 'block' : 'none';
+  } catch (_) {
+    showToast('Could not load creators');
+  } finally {
+    starsLoading = false;
+    $('#stars-more').textContent = 'Load more creators';
+  }
+}
+$('#stars-btn').addEventListener('click', () => {
+  if (starsPage === 0) loadCreators();
+});
+$('#stars-more').addEventListener('click', loadCreators);
+
+/* Region menu */
+(function buildRegionMenu() {
+  const grid = $('#region-grid');
+  REGIONS.forEach(([tag, flag, label]) => {
+    const b = document.createElement('button');
+    b.className = 'panel-item' + (tag === '' ? ' active' : '');
+    b.dataset.tag = tag;
+    const f = document.createElement('span');
+    f.className = 'flag';
+    f.textContent = flag;
+    b.appendChild(f);
+    const l = document.createElement('span');
+    l.className = 'lbl';
+    l.textContent = label;
+    b.appendChild(l);
+    b.addEventListener('click', () => {
+      state.region = tag;
+      grid.querySelectorAll('.panel-item').forEach(x =>
+        x.classList.toggle('active', x === b));
+      $('#region-btn').innerHTML = flag + ' ' + label + ' <span class="caret">▼</span>';
+      closeMenus();
+      state.creator = null;
+      loadPage(1);
+    });
+    grid.appendChild(b);
+  });
+})();
+
 /* ---------------- search box extras ---------------- */
 const input = $('#search-input');
 const suggestBox = $('#suggest');
@@ -988,6 +1302,12 @@ $('#order-select').addEventListener('change', () =>
 $('#brand').addEventListener('click', () => {
   input.value = '';
   $('#order-select').value = 'trending';
+  state.region = '';
+  state.creator = null;
+  $('#region-btn').innerHTML = '🌍 All Regions <span class="caret">▼</span>';
+  const rg = $('#region-grid');
+  rg.querySelectorAll('.panel-item').forEach(x =>
+    x.classList.toggle('active', x.dataset.tag === ''));
   startSearch('', 'trending');
 });
 $('#retry-btn').addEventListener('click', () => loadPage(state.page || 1));
